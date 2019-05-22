@@ -21,6 +21,13 @@ public class Data {
         weights = readTable(bufferedReader, size);
     }
 
+    public Data(int[][] distances, int[][] weights, int size) {
+
+        this.distances = distances;
+        this.weights = weights;
+        this.size = size;
+    }
+
     private int[][] readTable(BufferedReader bufferedReader, int size) throws IOException {
         int[][] table = new int[size][size];
         for (int i = 0; i < size; i++) {
@@ -35,9 +42,10 @@ public class Data {
     }
 
     private String removeAlinea(String line) {
-        int i = 0;
-        while(line.length() > i && line.charAt(i) == ' ') i++;
-        return line.substring(i);
+        int nbEspace = 0;
+        while(line.length() > nbEspace && line.charAt(nbEspace) == ' ')
+            nbEspace++;
+        return line.substring(nbEspace);
     }
     public int[][] getDistances() {
         return distances;
@@ -47,10 +55,14 @@ public class Data {
         return weights;
     }
 
+    public int getSize() { return size; }
+
     @Override
     public String toString() {
-        StringBuilder distances = new StringBuilder("[\n");
-        StringBuilder weights = new StringBuilder("[\n");
+
+        final StringBuilder distances = new StringBuilder();
+        final StringBuilder weights = new StringBuilder();
+
         for(int i = 0; i < size; i++) {
             distances.append("[ ");
             weights.append("[ ");
@@ -61,10 +73,16 @@ public class Data {
             distances.append("]\n");
             weights.append("]\n");
         }
-        distances.append("]");
-        weights.append("]");
-        return "size :" + this.size + "\n" +
-                "distances :\n" + distances.toString() + "\n" +
-                "weights :\n" + weights.toString();
+
+        return "Data {" + "\n" +
+                "size :" + this.size + "\n" +
+                "distances :\n" + distances.toString() +
+                "weights :\n" + weights.toString() +
+                "}\n";
+    }
+
+    public Data clone() {
+
+        return new Data(Arrays.copyOf(distances, size), Arrays.copyOf(weights, size), size);
     }
 }
