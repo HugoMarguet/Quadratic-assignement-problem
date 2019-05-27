@@ -16,7 +16,8 @@ public class QAP {
     }
 
     public QAP(Data data, Map<Integer, Integer> map) {
-
+        this.data = data;
+        this.map = map;
     }
 
     public int sum(Map<Integer, Integer> arrangement) {
@@ -29,11 +30,19 @@ public class QAP {
         return sum;
     }
 
+    public int getSum(){
+        return sum(map);
+    }
+
     public void permute(int i, int j) {
 
         int temp = map.get(i);
         map.put(i,map.get(j));
         map.put(j,temp);
+    }
+
+    public Data getData(){
+        return data;
     }
 
     public String toString() {
