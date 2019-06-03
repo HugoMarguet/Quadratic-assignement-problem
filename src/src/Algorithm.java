@@ -1,11 +1,17 @@
+import javafx.util.Pair;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 public class Algorithm {
 
-    private QAP qap;
+    private final QAP qap;
+    private final int size;
 
     public Algorithm(QAP qap) {
         this.qap = qap;
+        this.size = qap.getSize();
     }
 
     public QAP aleaWalk() {
@@ -17,7 +23,6 @@ public class Algorithm {
     public QAP simulatedAnnealing(int maxIterations, double temperature, double temperatureVariation ){
 
         Random random = new Random();
-        int size = qap.getSize();
         QAP bestSolution = qap.clone(), currentSolution = qap.clone(), solutionToTest;
         int indexToPermute2, indexToPermute1;
         int solutionToTestSum, currentSolutionSum;
@@ -44,11 +49,40 @@ public class Algorithm {
             }
             //System.out.println(probabilityIfWorse);
         }
-
         return bestSolution;
     }
 
-    public QAP tabou() {
-        return qap.clone();
+    public QAP tabou(int Tsize, int maxIterations) {
+        List<Pair> T = new ArrayList<>();
+        QAP tabooSolution = qap.clone(), currentSolution = tabooSolution.clone(), solutionToTest = currentSolution.clone();
+
+        int solutionToTestSum;
+        Pair<Integer, Integer> transition = new Pair<>(0,0);
+        Integer bestLocalSolution;
+        int compteur = 0;
+        while (T.size() <= Tsize && (Tsize != T.size() || compteur < maxIterations)) {
+            compteur ++;
+            bestLocalSolution = Integer.MAX_VALUE;
+            for (int i = 0; i < size; i++) {
+                for (int j = i + 1; j < size; j++) {
+                    if (i != j && !T.contains(new Pair(i,j))) {
+                        solutionToTest.permute(i,j);
+                        solutionToTestSum = solutionToTest.sum();
+                        if (bestLocalSolution > solutionToTestSum) {
+                            bestLocalSolution = solutionToTestSum;
+                            transition = new Pair<>(i,j);
+                        }
+                        solutionToTest = currentSolution.clone();
+                    }
+                }
+            }
+            if (currentSolution.sum() < bestLocalSolution)
+                T.add(new Pair(transition.getKey(), transition.getValue()));
+            currentSolution.permute(transition.getKey(), transition.getValue());
+            if (tabooSolution.sum() > currentSolution.sum())
+                tabooSolution = currentSolution.clone();
+        }
+
+        return tabooSolution;
     }
 }

@@ -14,8 +14,13 @@ public class Main {
             //TODO: tester l'algorithme avec des meilleures valeurs
             QAP simulatedAnnealing = new Algorithm(qap).simulatedAnnealing(100, qap.sum(), 0.9);
             System.out.println("QAP found with simulated annealing:");
-            System.out.println(simulatedAnnealing.toString());
+            //System.out.println(simulatedAnnealing.toString());
             System.out.println("QAP sum: " + simulatedAnnealing.sum());
+
+            QAP tabou = new Algorithm(qap).tabou(7, 100000000);
+            System.out.println("QAP found with method tabou:");
+            //System.out.println(simulatedAnnealing.toString());
+            System.out.println("QAP sum: " + tabou.sum());
 
         } catch (IOException e) {
             e.printStackTrace();
