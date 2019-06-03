@@ -5,8 +5,8 @@ public class Main {
     public static void main (String[] args){
         try {
             QAP qap = new QAP("data/tai12a.txt");
-            System.out.println("Initial QAP:");
-            System.out.println(qap.toString());
+            //System.out.println("Initial QAP:");
+            //System.out.println(qap.toString());
             System.out.println("QAP sum: " + qap.sum());
 
             System.out.println("---------------------------------------");
@@ -17,8 +17,9 @@ public class Main {
             //System.out.println(simulatedAnnealing.toString());
             System.out.println("QAP sum: " + simulatedAnnealing.sum());
 
-            QAP tabou = new Algorithm(qap).tabou(7, 100000000);
-            System.out.println("QAP found with method tabou:");
+            System.out.println("---------------------------------------");
+            QAP tabou = new Algorithm(qap).tabou(200, 100000);
+            System.out.println("QAP found with method tabou: ");
             //System.out.println(simulatedAnnealing.toString());
             System.out.println("QAP sum: " + tabou.sum());
 

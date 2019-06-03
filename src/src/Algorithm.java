@@ -20,7 +20,11 @@ public class Algorithm {
         return qap;
     }
 
-    public QAP simulatedAnnealing(int maxIterations, double temperature, double temperatureVariation ){
+    /**
+     *
+     * @return solution when simulated Annealing
+     */
+    public QAP simulatedAnnealing(int nbIterations, double temperature, double temperatureVariation ){
 
         Random random = new Random();
         QAP bestSolution = qap.clone(), currentSolution = qap.clone(), solutionToTest;
@@ -28,7 +32,7 @@ public class Algorithm {
         int solutionToTestSum, currentSolutionSum;
         double probabilityIfWorse;
 
-        for(int i=0; i<maxIterations; i++){
+        for(int i = 0; i < nbIterations; i++){
 
             indexToPermute1 = random.nextInt(size);
             do
@@ -52,6 +56,12 @@ public class Algorithm {
         return bestSolution;
     }
 
+    /**
+     *
+     * @param Tsize should be lower than the sum of integers from 0 to QAP' size - 1  to be useful
+     * @param maxIterations to avoid infinite loop
+     * @return Tabou algorithm's solution
+     */
     public QAP tabou(int Tsize, int maxIterations) {
         List<Pair> T = new ArrayList<>();
         QAP tabooSolution = qap.clone(), currentSolution = tabooSolution.clone(), solutionToTest = currentSolution.clone();
@@ -60,7 +70,7 @@ public class Algorithm {
         Pair<Integer, Integer> transition = new Pair<>(0,0);
         Integer bestLocalSolution;
         int compteur = 0;
-        while (T.size() <= Tsize && (Tsize != T.size() || compteur < maxIterations)) {
+        while (T.size() <= Tsize && compteur < maxIterations) {
             compteur ++;
             bestLocalSolution = Integer.MAX_VALUE;
             for (int i = 0; i < size; i++) {
@@ -83,6 +93,7 @@ public class Algorithm {
                 tabooSolution = currentSolution.clone();
         }
 
+        System.out.println("Compteur : " + compteur + " -- T size: " + T.size() + "/" + size*(size - 1)/ 2);
         return tabooSolution;
     }
 }
