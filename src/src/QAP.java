@@ -49,7 +49,10 @@ public class QAP {
 
     private String removeAlinea(String line) {
         int nbEspace = 0;
-        while(line.length() > nbEspace && line.charAt(nbEspace) == ' ')
+        int a;
+        while(line
+                .length() > nbEspace && line
+                .charAt(nbEspace) == ' ')
             nbEspace++;
         return line.substring(nbEspace);
     }
