@@ -12,7 +12,12 @@ public class QAP {
     private int[][] weights;
     private int size;
 
-    public QAP(String filePath) throws IOException {
+    private int optimalSolution;
+
+    public QAP(String filePath, int optimalSolution) throws IOException {
+
+        this.optimalSolution = optimalSolution;
+
 
         BufferedReader bufferedReader = new BufferedReader(new FileReader(filePath));
         size = Integer.valueOf(removeAlinea(bufferedReader.readLine()));
@@ -26,12 +31,13 @@ public class QAP {
             locationWithFacility.put(i,i);
     }
 
-    public QAP(Map<Integer, Integer> locationWithFacility, int size, int[][] distances, int[][] weights) {
+    public QAP(Map<Integer, Integer> locationWithFacility, int size, int[][] distances, int[][] weights, int optimalSolution) {
 
         this.distances = distances;
         this.weights = weights;
         this.size = size;
         this.locationWithFacility = locationWithFacility;
+        this.optimalSolution = optimalSolution;
     }
 
     private int[][] readTable(BufferedReader bufferedReader, int size) throws IOException {
@@ -71,12 +77,27 @@ public class QAP {
         locationWithFacility.put(j,temp);
     }
 
+    public boolean isOptimal() throws Exception {
+        int sum = sum();
+        if (sum < optimalSolution)
+            throw new Exception("Solution can't be better than optimal one");
+        return sum == optimalSolution;
+    }
+
     public int getSize() {
         return size;
     }
 
     public Map<Integer, Integer> getLocationWithFacility() {
         return locationWithFacility;
+    }
+
+    public int getOptimalSolution() {
+        return optimalSolution;
+    }
+
+    public void setOptimalSolution(int optimalSolution) {
+        this.optimalSolution = optimalSolution;
     }
 
     public String toString() {
@@ -104,6 +125,6 @@ public class QAP {
     }
 
     public QAP clone() {
-        return new QAP(new HashMap<>(locationWithFacility), size, Arrays.copyOf(distances, size), Arrays.copyOf(weights, size));
+        return new QAP(new HashMap<>(locationWithFacility), size, Arrays.copyOf(distances, size), Arrays.copyOf(weights, size), optimalSolution);
     }
 }

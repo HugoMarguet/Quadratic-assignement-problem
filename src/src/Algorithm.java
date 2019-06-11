@@ -21,7 +21,7 @@ public class Algorithm {
      * Temporel complexity : O(nbIterations)
      * @return solution when simulated Annealing
      */
-    public QAP simulatedAnnealing(int nbIterations, double temperature, double temperatureVariation) {
+    public QAP simulatedAnnealing(int nbIterations, double temperature, double temperatureVariation) throws Exception {
 
         Random random = new Random();
         QAP bestSolution = qap.clone(), currentSolution = qap.clone(), solutionToTest;
@@ -41,6 +41,8 @@ public class Algorithm {
             solutionToTestSum = solutionToTest.sum();
             currentSolutionSum = currentSolution.sum();
             probabilityIfWorse = (currentSolutionSum - solutionToTestSum) / temperature;
+            if (solutionToTest.isOptimal())
+                return solutionToTest;
             if (solutionToTestSum < currentSolutionSum || random.nextDouble() <= probabilityIfWorse) {
                 if (solutionToTestSum < bestSolution.sum())
                     bestSolution = solutionToTest.clone();
@@ -60,7 +62,7 @@ public class Algorithm {
      * @param maxIterations use to avoid infinite loop
      * @return Tabou algorithm's solution
      */
-    public QAP tabou(int Tsize, int maxIterations, int neighbourhoodSize) {
+    public QAP tabou(int Tsize, int maxIterations, int neighbourhoodSize) throws Exception {
         List<Pair<Integer, Integer>> T = new ArrayList<>();
         QAP tabooSolution = qap.clone(), currentSolution = tabooSolution.clone(), solutionToTest = currentSolution.clone();
 
@@ -91,6 +93,8 @@ public class Algorithm {
                 T.add(new Pair<>(transition.getKey(), transition.getValue()));
             }
             currentSolution.permute(transition.getKey(), transition.getValue());
+            if (currentSolution.isOptimal())
+                return currentSolution;
             if (tabooSolution.sum() > currentSolution.sum())
                 tabooSolution = currentSolution.clone();
         }
@@ -99,19 +103,45 @@ public class Algorithm {
         return tabooSolution;
     }
 
-    private int[] neighbourhood(int size, int neighbour) {
+    /**
+     *
+     * @param demiSize neiberhood size : node will have size * 2 neighbours : size for each side
+     * @param node
+     * @return List of neigbours
+     */
+    private List<Integer> neighbourhood(int demiSize, int node) {
 
+        int seq;
         final int QAPsize = qap.getSize();
-        int [] neighbours = new int[size];
-        for (int i = 0; i < size; i++)
-            neighbours[i] = i % 2 == 0 ?
-                    neighbour + i >= QAPsize ?
-                            neighbour + i - QAPsize
-                            : neighbour + i
-                    : neighbour - i < 0 ?
-                            neighbour - i + QAPsize
-                            : neighbour - i;
+        demiSize *= 2;
+        if (demiSize > QAPsize)
+            demiSize = QAPsize;
+        List<Integer> neighbours = new ArrayList<>();
+        for (int i = 0; i < demiSize; i++)
+            if ((seq = modulo(node + sequence(i), QAPsize)) > node)
+            neighbours.add(modulo(seq,QAPsize));
         return neighbours;
+    }
+
+    /**
+     *
+     * @param i
+     * @return
+     */
+    private int sequence(int i) {
+        final int QAPsize = qap.getSize();
+        final boolean positif = i % 2 == 0;
+        return (positif ? 1 : - 1) * (i/2 + 1);
+    }
+
+    /**
+     *
+     * @param i
+     * @param m modulo
+     * @return i % m if i is positif else -i % m
+     */
+    private int modulo(int i, int m) {
+        return ((i % m) + m) % m;
     }
 
     public QAP getQap() {
