@@ -1,58 +1,14 @@
 import javafx.util.Pair;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Random;
+import java.util.Set;
 
-public class Algorithm {
+public class Tabou extends Algorithms {
 
-    private final QAP qap;
-    private final int size;
-
-    public Algorithm(QAP qap) throws Exception {
-        if (qap.getSize() <= 1)
-            throw new Exception("Size should be higher than 1");
-        this.qap = qap;
-        this.size = qap.getSize();
-    }
-
-    /**
-     * Neighbourhood' size equals to QAP' size
-     * Temporel complexity : O(nbIterations)
-     * @return solution when simulated Annealing
-     */
-    public QAP simulatedAnnealing(int nbIterations, double temperature, double temperatureVariation) throws Exception {
-
-        Random random = new Random();
-        QAP bestSolution = qap.clone(), currentSolution = qap.clone(), solutionToTest;
-        int indexToPermute2, indexToPermute1;
-        int solutionToTestSum, currentSolutionSum;
-        double probabilityIfWorse;
-
-        for (int i = 0; i < nbIterations; i++) {
-
-            indexToPermute1 = random.nextInt(size);
-            do
-                indexToPermute2 = random.nextInt(size);
-            while (indexToPermute2 == indexToPermute1);
-            solutionToTest = currentSolution.clone();
-            solutionToTest.permute(indexToPermute1, indexToPermute2);
-
-            solutionToTestSum = solutionToTest.sum();
-            currentSolutionSum = currentSolution.sum();
-            probabilityIfWorse = (currentSolutionSum - solutionToTestSum) / temperature;
-            if (solutionToTest.isOptimal())
-                return solutionToTest;
-            if (solutionToTestSum < currentSolutionSum || random.nextDouble() <= probabilityIfWorse) {
-                if (solutionToTestSum < bestSolution.sum())
-                    bestSolution = solutionToTest.clone();
-
-                currentSolution = solutionToTest.clone();
-                temperature *= temperatureVariation;
-            }
-            //System.out.println(probabilityIfWorse);
-        }
-        return bestSolution;
+    public Tabou(QAP qap) throws Exception {
+        super(qap);
     }
 
     /**
@@ -62,9 +18,11 @@ public class Algorithm {
      * @param maxIterations use to avoid infinite loop
      * @return Tabou algorithm's solution
      */
-    public QAP tabou(int Tsize, int maxIterations, int neighbourhoodSize) throws Exception {
+    public QAP execute(int Tsize, int maxIterations, int neighbourhoodSize) throws Exception {
         List<Pair<Integer, Integer>> T = new ArrayList<>();
-        QAP tabooSolution = qap.clone(), currentSolution = tabooSolution.clone(), solutionToTest = currentSolution.clone();
+        QAP tabouSolution = qap.clone(), currentSolution = tabouSolution.clone(), solutionToTest = currentSolution.clone();
+        Set<State> states = new HashSet<>();
+        states.add(new State(qap.getLocationWithFacility(), T));
 
         int solutionToTestSum;
         Pair<Integer, Integer> transition = null;
@@ -93,14 +51,37 @@ public class Algorithm {
                 T.add(new Pair<>(transition.getKey(), transition.getValue()));
             }
             currentSolution.permute(transition.getKey(), transition.getValue());
-            if (currentSolution.isOptimal())
-                return currentSolution;
-            if (tabooSolution.sum() > currentSolution.sum())
-                tabooSolution = currentSolution.clone();
+            if (tabouSolution.sum() > currentSolution.sum())
+                tabouSolution = currentSolution.clone();
+
+            if (tabouSolution.isOptimal() && !states.add(new State(currentSolution.getLocationWithFacility(), T)))
+                return tabouSolution;
         }
 
         //System.out.println("Compteur : " + compteur + "/" + maxIterations + " -- T size : " + T.size() + "/" + Tsize);
-        return tabooSolution;
+        return tabouSolution;
+    }
+
+    public int findOptimalTSize(int maxIterations, int neighbourhoodSize) throws Exception {
+        final int TsizeMax = size * (size - 1) / 2;
+        int TsizeBest = 0, TsizeBestValue = Integer.MAX_VALUE, sum;
+
+        for (int Tsize = 1; Tsize <= TsizeMax; Tsize++) {
+            if ((sum = execute(Tsize, 1000, neighbourhoodSize).sum()) < TsizeBestValue) {
+                TsizeBestValue = sum;
+                TsizeBest = Tsize;
+
+            }
+        }
+        return TsizeBest;
+    }
+
+    public int[] executeMultiple(int[] Tsizes, int neighbourhoodSize) throws Exception {
+
+        int[] solutions = new int[Tsizes.length];
+        for (int i = 0; i < Tsizes.length; i++)
+            solutions[i] = execute(Tsizes[i], 1000, neighbourhoodSize).sum();
+        return solutions;
     }
 
     /**
@@ -119,7 +100,7 @@ public class Algorithm {
         List<Integer> neighbours = new ArrayList<>();
         for (int i = 0; i < demiSize; i++)
             if ((seq = modulo(node + sequence(i), QAPsize)) > node)
-            neighbours.add(modulo(seq,QAPsize));
+                neighbours.add(modulo(seq,QAPsize));
         return neighbours;
     }
 
@@ -143,9 +124,4 @@ public class Algorithm {
     private int modulo(int i, int m) {
         return ((i % m) + m) % m;
     }
-
-    public QAP getQap() {
-        return qap;
-    }
-
 }
