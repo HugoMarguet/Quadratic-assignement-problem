@@ -19,24 +19,34 @@ public class Tabou extends Algorithms {
      * @return Tabou algorithm's solution
      */
     public QAP execute(int Tsize, int maxIterations, int neighbourhoodSize) throws Exception {
+        // Liste Tabou
         List<Pair<Integer, Integer>> T = new ArrayList<>();
+        // Les solutions
         QAP tabouSolution = qap.clone(), currentSolution = tabouSolution.clone(), solutionToTest = currentSolution.clone();
+        // Liste d'états (solution et liste Tabou)
         Set<State> states = new HashSet<>();
         states.add(new State(qap.getLocationWithFacility(), T));
+        // permutation
+        Pair<Integer, Integer> transition = null;
 
         int solutionToTestSum;
-        Pair<Integer, Integer> transition = null;
         int bestLocalSolution;
         int compteur = 0;
+
+        // On vérifie qu'il a trouvé une permutaion possible ie tous le voisinages n'est pas bloqué par la liste Tabou
+        // A maxItérations on sort du while
         while (!(new Pair<>(0,0)).equals(transition) && compteur < maxIterations) {
             compteur++;
             bestLocalSolution = Integer.MAX_VALUE;
             transition = new Pair<>(0,0);
+            // Parcours du voisinage avec la privation de la liste Tabou
             for (int i = 0; i < size; i++) {
                 for (int j : neighbourhood(neighbourhoodSize,i)) {
                     if (!T.contains(new Pair<>(i, j))) {
+                        // On permute et on teste la solution
                         solutionToTest.permute(i, j);
                         solutionToTestSum = solutionToTest.sum();
+                        // A la première itération la condition du if est vrai car bestLocalSolution et le plus grand entier
                         if (bestLocalSolution > solutionToTestSum) {
                             bestLocalSolution = solutionToTestSum;
                             transition = new Pair<>(i, j);
@@ -45,6 +55,7 @@ public class Tabou extends Algorithms {
                     }
                 }
             }
+            // Si la solution trouvé est moins bonne on ajoute la transition inverse à la liste Tabou
             if (currentSolution.sum() < bestLocalSolution) {
                 if (T.size() == Tsize)
                     T.remove(0);
@@ -54,6 +65,7 @@ public class Tabou extends Algorithms {
             if (tabouSolution.sum() > currentSolution.sum())
                 tabouSolution = currentSolution.clone();
 
+            // Si la solution optimale et trouvé ou que l'algorithme retombe sur le même état on retourne la meilleure solution
             if (tabouSolution.isOptimal() && !states.add(new State(currentSolution.getLocationWithFacility(), T)))
                 return tabouSolution;
         }
@@ -62,6 +74,13 @@ public class Tabou extends Algorithms {
         return tabouSolution;
     }
 
+    /**
+     *
+     * @param maxIterations
+     * @param neighbourhoodSize
+     * @return la taille de la liste Tabou correspondant à la meilleur solution
+     * @throws Exception
+     */
     public int findOptimalTSize(int maxIterations, int neighbourhoodSize) throws Exception {
         final int TsizeMax = size * (size - 1) / 2;
         int TsizeBest = 0, TsizeBestValue = Integer.MAX_VALUE, sum;
