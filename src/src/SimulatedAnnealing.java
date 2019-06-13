@@ -63,14 +63,6 @@ public class SimulatedAnnealing extends Algorithms {
             for(double temperatureVariation: temperatureVariations){
                 int fitness = execute(1000,initialTemperature, temperatureVariation).sum();
 
-                //TODO A retirer (code pour générer les graphs)
-                String variationString = Double.toString(temperatureVariation);
-                if(variationString.length()>4)
-                    variationString = variationString.substring(0, 4);
-                String initialString = Double.toString(initialTemperature);
-                initialString = initialString.substring(0, initialString.length()-2);
-                System.out.println(initialString + ";" + variationString + ";" + fitness);
-
                 if(fitness < bestFitness){
                     bestFitness = fitness;
                     bestInitialTemperature = initialTemperature;
