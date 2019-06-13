@@ -57,7 +57,7 @@ public class SimulatedAnnealing extends Algorithms {
     public double[] executeMultiple(List<Double> initialTemperatures, List<Double> temperatureVariations) throws Exception {
         int bestFitness = Integer.MAX_VALUE;
         double bestInitialTemperature = -1d, bestTemperatureVariation = -1d;
-        System.out.println("initialTemperature;temperatureVariation;fitness");
+        //System.out.println("initialTemperature;temperatureVariation;fitness");
 
         for(double initialTemperature: initialTemperatures){
             for(double temperatureVariation: temperatureVariations){
