@@ -1,6 +1,8 @@
 import javafx.util.Pair;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 
@@ -23,19 +25,29 @@ public class Main {
                 QAPs.put(sizeSol.getKey(), new Pair<>(new Tabou(qap), new SimulatedAnnealing(qap)));
             }
 
+            List<Double> temperatures = new ArrayList<>();
+            for(double temperature = 0; temperature <= 25000; temperature+=100){
+                temperatures.add(temperature);
+            }
+            List<Double> temperatureVariations = new ArrayList<>();
+            for(double temperatureVariation = 0.9; temperatureVariation <= 0.991; temperatureVariation+=0.01){
+                temperatureVariations.add(temperatureVariation);
+            }
 
-            qap = QAPs.get(12).getKey().getQap();
-            System.out.println("-------------------------------------------------------------------------------------\n");
-            System.out.println(" QAP 12 : " + optimalSolutions.get(12));
-            System.out.println("******* Tabou : Tsize max = " + integerSum(12 - 1));
-            System.out.println(QAPs.get(12).getKey().executeMultiple(new int[]{8}, 12)[0]);
-            System.out.println("******* Similated Annealing : ");
-            QAPs.get(12).getValue().execute(100, qap.sum(),0.9);
+            //int[] sizes = {12, 15, 17, 20, 25, 30, 35, 40, 50, 60, 80, 100};
+            int[] sizes = {15};
+            for(int size : sizes) {
+                qap = QAPs.get(size).getKey().getQap();
+                System.out.println("-------------------------------------------------------------------------------------\n");
+                System.out.println(" QAP " + size + " : " + optimalSolutions.get(size));
+                System.out.println("******* Tabou : Tsize max = " + integerSum(size - 1));
+                System.out.println(QAPs.get(size).getKey().executeMultiple(new int[]{8}, size)[0]);
 
-
-
-
-
+                double[] simulatedAnnealingResults = QAPs.get(size).getValue().executeMultiple(temperatures, temperatureVariations);
+                System.out.println("******* Simulated Annealing : the best solution has been found with initial temperature "
+                        + simulatedAnnealingResults[1] + " and temperature variation " + simulatedAnnealingResults[2]);
+                System.out.println((int) simulatedAnnealingResults[0]);
+            }
 
         } catch (Exception e) {
             e.printStackTrace();

@@ -127,4 +127,20 @@ public class QAP {
     public QAP clone() {
         return new QAP(new HashMap<>(locationWithFacility), size, Arrays.copyOf(distances, size), Arrays.copyOf(weights, size), optimalSolution);
     }
+
+    public double getAvgNeighboursFitnessDifference(){
+        int numberOfNeighbours = 0;
+        int neighboursFitnessDifferenceSum = 0;
+
+        for (int i = 0; i < size; i++) {
+            for (int j = i + 1; j < size; j++) {
+                QAP neighbour = this.clone();
+                neighbour.permute(i, j);
+                neighboursFitnessDifferenceSum += Math.abs(this.sum() - neighbour.sum());
+                numberOfNeighbours ++;
+            }
+        }
+
+        return (double)neighboursFitnessDifferenceSum/numberOfNeighbours;
+    }
 }
