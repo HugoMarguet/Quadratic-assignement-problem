@@ -76,11 +76,19 @@ public class Tabou extends Algorithms {
         return TsizeBest;
     }
 
-    public int[] executeMultiple(int[] Tsizes, int neighbourhoodSize) throws Exception {
+    public int[] executeMultipleTsizes(int[] Tsizes, int neighbourhoodSize, int maxIterations) throws Exception {
 
         int[] solutions = new int[Tsizes.length];
         for (int i = 0; i < Tsizes.length; i++)
-            solutions[i] = execute(Tsizes[i], 1000, neighbourhoodSize).sum();
+            solutions[i] = execute(Tsizes[i], maxIterations, neighbourhoodSize).sum();
+        return solutions;
+    }
+
+    public int[] executeMultipleNeighbours(int Tsize, int[] neighbourhoodSizes, int maxIterations) throws Exception {
+
+        int[] solutions = new int[neighbourhoodSizes.length];
+        for (int i = 0; i < neighbourhoodSizes.length; i++)
+            solutions[i] = execute(Tsize, maxIterations, neighbourhoodSizes[i]).sum();
         return solutions;
     }
 
@@ -94,7 +102,7 @@ public class Tabou extends Algorithms {
 
         int seq;
         final int QAPsize = qap.getSize();
-        demiSize *= 2;
+        demiSize += demiSize % 2;
         if (demiSize > QAPsize)
             demiSize = QAPsize;
         List<Integer> neighbours = new ArrayList<>();

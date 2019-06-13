@@ -13,17 +13,17 @@ public class State {
         this.listTabou = listTabou;
     }
 
-    public int hashCode() {
-        return locationWithFaciilities.hashCode() * 17
-                + listTabou.hashCode() * 31;
-    }
-
     public Map<Integer, Integer> getLocationWithFaciilities() {
         return locationWithFaciilities;
     }
 
     public List<Pair<Integer, Integer>> getListTabou() {
         return listTabou;
+    }
+
+    public int hashCode() {
+        return locationWithFaciilities.hashCode() * 17
+                + listTabou.hashCode() * 31;
     }
 
     public boolean equals(Object obj) {
